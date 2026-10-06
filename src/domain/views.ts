@@ -1,7 +1,7 @@
 import { addMonths, differenceInMonths, parseISO, startOfDay } from 'date-fns';
 import { SYSTEM_LABELS, weekLabel, type Bucket, type Item } from './types';
 import { estimateOf } from './estimates';
-import { dueDate, hasTime, isFuture, isOverdue, isToday, toApiDate } from './dates';
+import { deadlineDate, dueDate, hasTime, isFuture, isOverdue, isToday, toApiDate } from './dates';
 
 /** Case-insensitive label test, so `Week` and `week` behave the same. */
 export const hasLabel = (item: Item, label: string): boolean =>
@@ -37,6 +37,22 @@ export function bucketOf(item: Item, now = new Date()): Bucket {
     if (isToday(item, now)) return 'today';
     if (isFuture(item, now)) return 'upcoming';
   }
+
+  // A deadline is also a real commitment. It must not disappear from Today or
+  // Upcoming merely because the task has no separately scheduled due date.
+  // When both exist, the due date remains the planning date and wins above.
+  const deadline = deadlineDate(item);
+  if (deadline) {
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (deadline < today) return 'overdue';
+    if (
+      deadline.getFullYear() === today.getFullYear()
+      && deadline.getMonth() === today.getMonth()
+      && deadline.getDate() === today.getDate()
+    ) return 'today';
+    return 'upcoming';
+  }
+
   return hasLabel(item, weekLabel()) ? 'anytime' : 'someday';
 }
 

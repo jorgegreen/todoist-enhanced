@@ -52,6 +52,35 @@ export function openItems(snapshot: Snapshot): Item[] {
 /** Top-level tasks only: subtasks are rendered under their parent, not beside it. */
 export const rootItems = (items: Item[]): Item[] => items.filter((i) => !i.parent_id);
 
+/**
+ * The rows that should sit on the surface of a derived view.
+ *
+ * A dated/tagged subtask is a task in its own right and must be able to make
+ * Today, My week or a tag page even when its parent does not. But when an
+ * ancestor matches the same view, that ancestor already renders the subtask
+ * beneath it, so listing both would duplicate the same task.
+ *
+ * `allItems` is the full open-task set, used only to walk through ancestors
+ * that may not themselves match the view (grandparent -> parent -> child).
+ */
+export function surfaceItems(matches: Item[], allItems: Item[]): Item[] {
+  const matched = new Set(matches.map((item) => item.id));
+  const byId = new Map(allItems.map((item) => [item.id, item]));
+
+  return matches.filter((item) => {
+    const seen = new Set<string>();
+    let parentId = item.parent_id;
+
+    while (parentId && !seen.has(parentId)) {
+      if (matched.has(parentId)) return false;
+      seen.add(parentId);
+      parentId = byId.get(parentId)?.parent_id ?? null;
+    }
+
+    return true;
+  });
+}
+
 export function applyFilters(
   items: Item[],
   filters: ViewFilters,

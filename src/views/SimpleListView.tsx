@@ -11,7 +11,7 @@ import { useTimePill } from '@/hooks/useTimePill';
 import { useData } from '@/hooks/useData';
 import { useStore } from '@/store/store';
 import { viewPrefs } from '@/store/prefs';
-import { applyFilters, pullQuick, rootItems, sortItems } from '@/store/selectors';
+import { applyFilters, pullQuick, rootItems, sortItems, surfaceItems } from '@/store/selectors';
 import { somedayItems, hasLabel, splitDust } from '@/domain/views';
 import { summariseLoad } from '@/domain/load';
 import type { TranslationKey } from '@/i18n';
@@ -66,10 +66,11 @@ function SimpleListBody({
       const inboxId = snapshot.user?.inbox_project_id;
       selection = inboxId ? roots.filter((i) => i.project_id === inboxId) : [];
     } else {
-      selection = labelName ? roots.filter((i) => hasLabel(i, labelName)) : [];
+      selection = labelName ? items.filter((i) => hasLabel(i, labelName)) : [];
     }
 
-    return applyFilters(selection, current.filters, snapshot, childrenOf);
+    const filtered = applyFilters(selection, current.filters, snapshot, childrenOf);
+    return kind === 'label' ? surfaceItems(filtered, items) : filtered;
   }, [items, kind, labelName, current.filters, snapshot, childrenOf]);
 
   /* The one flat list is drawn straight rather than through `ModeSurface`, and

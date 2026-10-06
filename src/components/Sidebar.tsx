@@ -5,7 +5,7 @@ import { useT } from '@/hooks/useT';
 import { useData } from '@/hooks/useData';
 import { useStore } from '@/store/store';
 import { navigate, type Route } from '@/hooks/useRoute';
-import { projectCounts, projectTree, rootItems, type ProjectNode } from '@/store/selectors';
+import { projectCounts, projectTree, rootItems, surfaceItems, type ProjectNode } from '@/store/selectors';
 import { anytimeItems, bucketOf, hasLabel, somedayItems, upcomingItems, weekItems } from '@/domain/views';
 import { markerStyle, avatarUrl } from '@/domain/colors';
 import { firstName, karmaStanding } from '@/domain/karma';
@@ -489,7 +489,7 @@ export function Sidebar({
             {favourites.projects.map((p) =>
               projectNode({ project: p, children: [] }, 'fav-'))}
             {favourites.labels.map((l) =>
-              tagItem(l.name, l.color, roots.filter((i) => hasLabel(i, l.name)).length))}
+              tagItem(l.name, l.color, surfaceItems(items.filter((i) => hasLabel(i, l.name)), items).length))}
           </SideGroup>
         )}
 

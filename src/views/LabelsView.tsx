@@ -5,7 +5,7 @@ import { useData } from '@/hooks/useData';
 import { useStore } from '@/store/store';
 import { navigate } from '@/hooks/useRoute';
 import { useTagDrag, useTagTopDrop } from '@/components/dnd/DraggableTag';
-import { rootItems } from '@/store/selectors';
+import { surfaceItems } from '@/store/selectors';
 import { hasLabel } from '@/domain/views';
 import { markerStyle } from '@/domain/colors';
 import type { Label } from '@/domain/types';
@@ -25,8 +25,6 @@ export function LabelsView() {
   const createLabel = useStore((s) => s.createLabel);
   const [draft, setDraft] = useState('');
   const { topDropRef, isTopOver } = useTagTopDrop();
-
-  const roots = useMemo(() => rootItems(items), [items]);
 
   const labels = useMemo(
     () =>
@@ -95,7 +93,7 @@ export function LabelsView() {
               key={label.id}
               label={label}
               order={labels.map((l) => l.name)}
-              count={roots.filter((i) => hasLabel(i, label.name)).length}
+              count={surfaceItems(items.filter((i) => hasLabel(i, label.name)), items).length}
               onToggleFavourite={() => void updateLabelFavourite(label.id, !label.is_favorite)}
             />
           ))}

@@ -12,7 +12,7 @@ import { useData } from '@/hooks/useData';
 import { useStore } from '@/store/store';
 import { useConfirm } from '@/components/overlays/Confirm';
 import { viewPrefs } from '@/store/prefs';
-import { applyFilters, rootItems, sortItems } from '@/store/selectors';
+import { applyFilters, sortItems, surfaceItems } from '@/store/selectors';
 import { anytimeItems, bucketOf, groupWeek, weekItems } from '@/domain/views';
 import { summariseLoad, weeklyCapacity } from '@/domain/load';
 import { toApiDate } from '@/domain/dates';
@@ -80,18 +80,18 @@ function WeekBody({
   const current = viewPrefs(prefs, viewKey);
 
   const scoped = useMemo(() => {
-    const roots = rootItems(items);
     const now = new Date();
     const inScope =
       scope === 'today'
-        ? roots.filter((i) => {
+        ? items.filter((i) => {
             const bucket = bucketOf(i, now);
             return bucket === 'overdue' || bucket === 'today';
           })
         : scope === 'anytime'
-          ? anytimeItems(roots, now)
-          : weekItems(roots, now);
-    return applyFilters(inScope, current.filters, snapshot, childrenOf);
+          ? anytimeItems(items, now)
+          : weekItems(items, now);
+    const filtered = applyFilters(inScope, current.filters, snapshot, childrenOf);
+    return surfaceItems(filtered, items);
   }, [items, current.filters, snapshot, childrenOf, scope]);
 
   const groups = useMemo(

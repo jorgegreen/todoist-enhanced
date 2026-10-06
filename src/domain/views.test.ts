@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ageInMonths, groupWeek, keptDay, pruneKept, readKept, splitDust, splitQuick,
+  ageInMonths, bucketOf, groupWeek, keptDay, pruneKept, readKept, splitDust, splitQuick,
 } from './views';
 import { due, item } from '@/test/items';
 
@@ -204,5 +204,30 @@ describe('ageInMonths', () => {
     expect(ageInMonths(item({ added_at: '2026-02-01T10:00:00' }), NOW)).toBe(8);
     expect(ageInMonths(item({ added_at: '2026-10-05T10:00:00' }), NOW)).toBe(1);
     expect(ageInMonths(item(), NOW)).toBe(0);
+  });
+});
+
+
+describe('bucketOf deadlines', () => {
+  it('puts a deadline-only task due today in Today', () => {
+    expect(bucketOf(item({
+      id: 'deadline-today',
+      deadline: { date: '2026-10-07', lang: 'en' },
+    }), NOW)).toBe('today');
+  });
+
+  it('puts a missed deadline-only task Behind schedule', () => {
+    expect(bucketOf(item({
+      id: 'deadline-late',
+      deadline: { date: '2026-10-06', lang: 'en' },
+    }), NOW)).toBe('overdue');
+  });
+
+  it('keeps the due date authoritative when a task also has a deadline', () => {
+    expect(bucketOf(item({
+      id: 'both',
+      due: due('2026-10-08'),
+      deadline: { date: '2026-10-07', lang: 'en' },
+    }), NOW)).toBe('upcoming');
   });
 });
