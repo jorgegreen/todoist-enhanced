@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupItems, pullQuick, sortItems } from './selectors';
+import { groupItems, pullQuick, sortItems, surfaceItems } from './selectors';
 import { emptySnapshot, type Project, type Section, type Snapshot } from '@/domain/types';
 import { due, item } from '@/test/items';
 
@@ -117,5 +117,33 @@ describe('pullQuick (#154)', () => {
     const { quick, rest } = pullQuick(page, false, 'manual', none, 'project', snapshot, now);
     expect(quick).toEqual([]);
     expect(rest).toBe(page);
+  });
+});
+
+
+describe('surfaceItems', () => {
+  it('surfaces a matching subtask when its parent does not match', () => {
+    const all = [
+      item({ id: 'parent' }),
+      item({ id: 'child', parent_id: 'parent', labels: ['Next Actions'] }),
+    ];
+    expect(surfaceItems([all[1]], all).map((task) => task.id)).toEqual(['child']);
+  });
+
+  it('does not duplicate a subtask when its parent already matches', () => {
+    const all = [
+      item({ id: 'parent', labels: ['Next Actions'] }),
+      item({ id: 'child', parent_id: 'parent', labels: ['Next Actions'] }),
+    ];
+    expect(surfaceItems(all, all).map((task) => task.id)).toEqual(['parent']);
+  });
+
+  it('hides a matching grandchild when any matching ancestor is already surfaced', () => {
+    const all = [
+      item({ id: 'grandparent', labels: ['Next Actions'] }),
+      item({ id: 'parent', parent_id: 'grandparent' }),
+      item({ id: 'child', parent_id: 'parent', labels: ['Next Actions'] }),
+    ];
+    expect(surfaceItems([all[0], all[2]], all).map((task) => task.id)).toEqual(['grandparent']);
   });
 });
