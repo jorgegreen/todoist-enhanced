@@ -509,7 +509,7 @@ function AppShell({
   const { contextItems, contextLabel } = useMemo(() => {
     switch (route.view) {
       case 'next':
-        return { contextItems: selectGtdNextActions(items, snapshot.projects).ready, contextLabel: t('nav.next') };
+        return { contextItems: selectGtdNextActions(items, snapshot.projects, snapshot.sections).ready, contextLabel: t('nav.next') };
       case 'project': {
         const project = route.id ? snapshot.projects[route.id] : undefined;
         return {
@@ -557,7 +557,7 @@ function AppShell({
       default:
         return { contextItems: roots, contextLabel: t(`nav.${route.view}` as TranslationKey) };
     }
-  }, [route, roots, items, snapshot.projects, snapshot.user?.inbox_project_id, t, weekLayout]);
+  }, [route, roots, items, snapshot.projects, snapshot.sections, snapshot.user?.inbox_project_id, t, weekLayout]);
 
   const unestimatedItems = useMemo(
     () => contextItems.filter((i) => effectiveEstimate(i, childrenOf).minutes === null),
