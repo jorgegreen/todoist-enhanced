@@ -57,6 +57,15 @@ export const en = {
 
   /* Navigation */
   'nav.inbox': 'Inbox',
+  'nav.next': 'Next Actions',
+  'gtd.intro': '{ready} ready · {review} to review. Tasks stay in Todoist; this view does not automatically change labels.',
+  'gtd.ready': 'Ready to do',
+  'gtd.empty': 'No ready actions. Label a concrete action @next_action or file it in Next Actions.',
+  'gtd.review': 'Needs review',
+  'gtd.reviewHint': 'These are marked as actions but appear held, represent outcomes, or still contain open subtasks. Open a task to clarify it.',
+  'gtd.held': 'Waiting / On hold',
+  'gtd.outcome': 'Outcome or heading',
+  'gtd.subtasks': 'Contains subtasks',
   'nav.week': 'My week',
   'nav.upcoming': 'Upcoming',
   'nav.someday': 'Someday',
