@@ -1,4 +1,4 @@
-import type { Item, Project } from './types';
+import type { Item, Project, Section } from './types';
 import { displayTaskContent, isUncompletable } from './types';
 import { isOpen } from './views';
 
@@ -58,14 +58,22 @@ function projectFlags(projectId: string, projects: Record<string, Project>): {
 }
 
 /** A parent's Waiting For / On Hold flag applies to all its subtasks. */
-function heldByAncestor(item: Item, byId: Map<string, Item>): boolean {
+function heldBySection(sectionId: string | null, sections: Record<string, Section>): boolean {
+  return Boolean(sectionId && HELD_PROJECTS.has(normalized(sections[sectionId]?.name ?? '')));
+}
+
+function heldByAncestor(
+  item: Item,
+  byId: Map<string, Item>,
+  sections: Record<string, Section>,
+): boolean {
   const seen = new Set<string>([item.id]);
   let id = item.parent_id;
   while (id && !seen.has(id)) {
     seen.add(id);
     const parent = byId.get(id);
     if (!parent) break;
-    if (hasAnyLabel(parent, HELD_LABELS)) return true;
+    if (hasAnyLabel(parent, HELD_LABELS) || heldBySection(parent.section_id, sections)) return true;
     id = parent.parent_id;
   }
   return false;
@@ -81,6 +89,7 @@ function heldByAncestor(item: Item, byId: Map<string, Item>): boolean {
 export function selectGtdNextActions(
   items: Item[],
   projects: Record<string, Project>,
+  sections: Record<string, Section> = {},
 ): GtdActionSelection {
   const byId = new Map(items.map((item) => [item.id, item]));
   const openChildren = new Set(
@@ -99,7 +108,7 @@ export function selectGtdNextActions(
     }
     if (!p.nextActions && !hasAnyLabel(item, NEXT_ACTION_LABELS)) continue;
 
-    if (p.held || hasAnyLabel(item, HELD_LABELS) || heldByAncestor(item, byId)) {
+    if (p.held || heldBySection(item.section_id, sections) || hasAnyLabel(item, HELD_LABELS) || heldByAncestor(item, byId, sections)) {
       needsReview.push({ item, reason: 'held' });
     } else if (isUncompletable(item) || hasAnyLabel(item, OUTCOME_LABELS) || !displayTaskContent(item).trim()) {
       needsReview.push({ item, reason: 'outcome' });
