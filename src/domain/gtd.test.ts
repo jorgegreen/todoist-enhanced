@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { item } from '@/test/items';
+import { due, item } from '@/test/items';
 import type { Project } from './types';
 import { selectGtdNextActions } from './gtd';
 
@@ -55,7 +55,7 @@ describe('selectGtdNextActions', () => {
 
   it('keeps future-dated actions visible (a due date is not a dependency)', () => {
     const selection = selectGtdNextActions([
-      item({ id: 'future', project_id: 'next', due: { date: '2027-03-01', lang: 'en' } }),
+      item({ id: 'future', project_id: 'next', due: due('2027-03-01') }),
     ], projects);
     expect(ids(selection.ready)).toEqual(['future']);
   });
