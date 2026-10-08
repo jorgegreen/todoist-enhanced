@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { due, item } from '@/test/items';
-import type { Project } from './types';
+import type { Project, Section } from './types';
 import { selectGtdNextActions } from './gtd';
 
 const project = (id: string, name: string, parent_id: string | null = null): Project =>
@@ -73,6 +73,22 @@ describe('selectGtdNextActions', () => {
     expect(ids(selection.needsReview.map(({ item: task }) => task))).toEqual([
       'bucket', 'childBucket', 'own', 'child', 'someday',
     ]);
+    expect(selection.needsReview.every(({ reason }) => reason === 'held')).toBe(true);
+  });
+
+  it('respects held sections, including holds inherited from a parent task', () => {
+    const sections: Record<string, Section> = {
+      hold: ({ id: 'hold', project_id: 'next', name: 'On Hold' }) as Section,
+      open: ({ id: 'open', project_id: 'next', name: 'Active' }) as Section,
+    };
+    const selection = selectGtdNextActions([
+      item({ id: 'direct', project_id: 'next', section_id: 'hold' }),
+      item({ id: 'parent', project_id: 'next', section_id: 'hold', labels: ['project'] }),
+      item({ id: 'child', project_id: 'next', section_id: 'open', parent_id: 'parent' }),
+      item({ id: 'active', project_id: 'next', section_id: 'open' }),
+    ], projects, sections);
+    expect(ids(selection.ready)).toEqual(['active']);
+    expect(ids(selection.needsReview.map(({ item: task }) => task))).toEqual(['direct', 'parent', 'child']);
     expect(selection.needsReview.every(({ reason }) => reason === 'held')).toBe(true);
   });
 
