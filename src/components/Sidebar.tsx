@@ -118,7 +118,7 @@ export function Sidebar({
     const now = new Date();
     return {
       inbox: inboxId ? roots.filter((i) => i.project_id === inboxId).length : 0,
-      next: selectGtdNextActions(items, snapshot.projects).ready.length,
+      next: selectGtdNextActions(items, snapshot.projects, snapshot.sections).ready.length,
       today: roots.filter((i) => {
         const bucket = bucketOf(i, now);
         return bucket === 'overdue' || bucket === 'today';
@@ -130,7 +130,7 @@ export function Sidebar({
       someday: somedayItems(roots).length,
       byProject: projectCounts(roots),
     };
-  }, [roots, items, snapshot.projects, inboxId, weekLayout]);
+  }, [roots, items, snapshot.projects, snapshot.sections, inboxId, weekLayout]);
 
   /** Favourites are Todoist's own star, not a separate list this app keeps. */
   const favourites = useMemo(() => {
