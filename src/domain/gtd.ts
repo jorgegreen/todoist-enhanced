@@ -25,7 +25,7 @@ export interface GtdActionSelection {
 }
 
 const normalized = (name: string): string =>
-  name.trim().toLowerCase().replace(/[\s_-]+/g, '');
+  name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 const hasAnyLabel = (item: Item, names: ReadonlySet<string>): boolean =>
   item.labels.some((label) => names.has(normalized(label)));
