@@ -21,8 +21,8 @@ export function NextActionsView({ onOpen }: { onOpen: (id: string) => void }) {
   const { t } = useT();
   const { snapshot, items, childrenOf } = useData();
   const { ready, needsReview } = useMemo(
-    () => selectGtdNextActions(items, snapshot.projects),
-    [items, snapshot.projects],
+    () => selectGtdNextActions(items, snapshot.projects, snapshot.sections),
+    [items, snapshot.projects, snapshot.sections],
   );
 
   return (
