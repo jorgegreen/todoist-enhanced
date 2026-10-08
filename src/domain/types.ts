@@ -264,6 +264,7 @@ export type Bucket = 'overdue' | 'today' | 'upcoming' | 'anytime' | 'someday';
 
 export type ViewId =
   | 'inbox'
+  | 'next'
   | 'week'
   /** Today on its own, when the sidebar is set to separate it from the week. */
   | 'today'
