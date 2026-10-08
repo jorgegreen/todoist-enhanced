@@ -59,6 +59,15 @@ export const fr: Record<TranslationKey, string> = {
 
   /* Navigation */
   'nav.inbox': 'Boîte de réception',
+  'nav.next': 'Prochaines actions',
+  'gtd.intro': '{ready} prêtes · {review} à vérifier. Les tâches restent dans Todoist et aucune étiquette n’est modifiée automatiquement.',
+  'gtd.ready': 'Actions possibles',
+  'gtd.empty': 'Aucune action prête. Ajoutez @next_action à une action concrète ou classez-la dans Prochaines actions.',
+  'gtd.review': 'À vérifier',
+  'gtd.reviewHint': 'Ces tâches sont marquées comme actions mais sont en attente, représentent des résultats, ou ont encore des sous-tâches. Ouvrez une tâche pour la clarifier.',
+  'gtd.held': 'En attente / Suspendue',
+  'gtd.outcome': 'Résultat ou en-tête',
+  'gtd.subtasks': 'Contient des sous-tâches',
   'nav.week': 'Cette semaine',
   'nav.upcoming': 'Prochainement',
   'nav.someday': 'Un jour',

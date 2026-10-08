@@ -18,6 +18,7 @@ import { QUICK_ADD, QuickAdd } from './QuickAdd';
 import { WeekView } from './views/WeekView';
 import { UpcomingView } from './views/UpcomingView';
 import { SimpleListView } from './views/SimpleListView';
+import { NextActionsView } from './views/NextActionsView';
 import { ProjectView } from './views/ProjectView';
 import { LabelsView } from './views/LabelsView';
 import { InsightsView } from './views/InsightsView';
@@ -43,6 +44,7 @@ import { navigate, useRoute, type Route } from './hooks/useRoute';
 import { rootItems } from './store/selectors';
 import { detectConflicts } from './domain/conflicts';
 import { anytimeItems, bucketOf, hasLabel, somedayItems, upcomingItems, weekItems } from './domain/views';
+import { selectGtdNextActions } from './domain/gtd';
 import { effectiveEstimate } from './domain/estimates';
 import type { Item } from './domain/types';
 import type { TranslationKey } from './i18n';
@@ -506,6 +508,8 @@ function AppShell({
   /** Whatever the page in front is showing, so the dialogs never describe another one. */
   const { contextItems, contextLabel } = useMemo(() => {
     switch (route.view) {
+      case 'next':
+        return { contextItems: selectGtdNextActions(items, snapshot.projects, snapshot.sections).ready, contextLabel: t('nav.next') };
       case 'project': {
         const project = route.id ? snapshot.projects[route.id] : undefined;
         return {
@@ -553,7 +557,7 @@ function AppShell({
       default:
         return { contextItems: roots, contextLabel: t(`nav.${route.view}` as TranslationKey) };
     }
-  }, [route, roots, snapshot.projects, snapshot.user?.inbox_project_id, t, weekLayout]);
+  }, [route, roots, items, snapshot.projects, snapshot.sections, snapshot.user?.inbox_project_id, t, weekLayout]);
 
   const unestimatedItems = useMemo(
     () => contextItems.filter((i) => effectiveEstimate(i, childrenOf).minutes === null),
@@ -702,6 +706,7 @@ function AppShell({
           {route.view === 'upcoming' && <UpcomingView {...viewProps} />}
           {route.view === 'someday' && <SimpleListView kind="someday" {...viewProps} />}
           {route.view === 'inbox' && <SimpleListView kind="inbox" {...viewProps} />}
+          {route.view === 'next' && <NextActionsView onOpen={openTask} />}
           {route.view === 'label' && route.id && (
             <SimpleListView kind="label" labelName={route.id} {...viewProps} />
           )}
